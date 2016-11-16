@@ -1,0 +1,61 @@
+{% load utils_tags %}
+<div class="NB-module-recommended NB-module {% if unmoderated and not page %}NB-recommended-unmoderated{% endif %}">
+  <h5 class="NB-module-header">
+    {% if unmoderated %}
+      Moderation Queue
+    {% else %}
+      Recommended Site
+    {% endif %}
+    <div class="NB-module-header-right">
+      {% if user.is_staff and not unmoderated %}
+        <div class="NB-recommended-show-moderation-wrapper">
+          <a href="#" class="NB-recommended-show-moderation" class="NB-splash-link" onclick="$('.NB-recommended-unmoderated').show();">Moderate</a>
+        </div>
+      {% endif %}
+
+      {% if has_next_page or has_previous_page %}
+        <a href="#" class="NB-module-direction NB-module-next-page NB-javascript {% if not has_next_page %}NB-disabled{% endif %}"></a>
+        <a href="#" class="NB-module-direction NB-module-previous-page {% if not has_previous_page %}NB-disabled{% endif %}"></a>
+      {% endif %}
+      <div class="NB-spinner NB-left"></div>
+      <div class="NB-module-recommended-date">
+        {% if unmoderated %}
+          {{ recommended_feed.created_date|date:"M j" }}
+          <span>{{ recommended_feed.created_date|date:"S" }}</span>,
+          {{ recommended_feed.created_date|date:"Y" }}
+        {% else %}
+          {{ recommended_feed.approved_date|date:"M j" }}
+          <span>{{ recommended_feed.approved_date|date:"S" }}</span>,
+          {{ recommended_feed.approved_date|date:"Y" }}
+        {% endif %}
+      </div>
+    </div>
+  </h5>
+  
+  <div class="NB-recommended" data-feed-id="{{ recommended_feed.feed_id }}">
+    <img class="NB-recommended-favicon" src="data:image/png;base64,{{ feed_icon.data }}" />
+    <div class="NB-recommended-title">{{ recommended_feed.feed.feed_title }}</div>
+    {# <div class="NB-recommended-link">{{ recommended_feed.feed.feed_link }}</div> #}
+    <div class="NB-recommended-description">{{ description|safe }}</div>
+    <div class="NB-modal-submit">
+      <div class="NB-recommended-subscribers">
+          <div class="NB-recommended-statistics NB-javascript"></div>
+        <b>{{ recommended_feed.feed.num_subscribers|commify }}</b> subscriber{{ recommended_feed.feed.num_subscribers|pluralize }}
+        <br />
+        <b>{{ recommended_feed.feed.average_stories_per_month }}</b> {{ recommended_feed.feed.average_stories_per_month|pluralize:"story,stories" }}  per month
+      </div>
+      {% if usersub %}
+        <div class="NB-recommended-added">Subscribed</div>
+      {% else %}
+        <div class="NB-recommended-try NB-modal-submit-green NB-modal-submit-button NB-javascript">Try</div>
+        <div class="NB-recommended-add NB-modal-submit-grey NB-modal-submit-button NB-javascript">Add</div>
+      {% endif %}
+      {% if unmoderated %}
+        <input type="text" class="NB-recommended-moderation-date" name="date" value="{{ today|date:"Y-m-d" }}" />
+        <div class="NB-recommended-approve NB-modal-submit-green NB-modal-submit-button NB-javascript">Approve</div>
+        <div class="NB-recommended-decline NB-modal-submit-grey NB-modal-submit-button NB-javascript">Decline</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>

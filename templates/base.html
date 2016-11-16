@@ -1,0 +1,325 @@
+{% load utils_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}PyTune{% endblock %}</title>
+  <link rel="shortcut icon" href="{{ MEDIA_URL }}img/favicon.ico" type="image/png" />
+  <link rel="icon" href="{{ MEDIA_URL }}img/favicon_32.png" sizes="32x32"/>
+  <link rel="icon" href="{{ MEDIA_URL }}img/favicon_64.png" sizes="64x64"/>
+  <link rel="apple-touch-icon" href="/media/img/mobile/apple-touch-icon-precomposed.png" />
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <meta name="msapplication-TileImage" content="{{ MEDIA_URL }}img/logo_144.png" />
+  <meta name="msapplication-TileColor" content="#F7E5A8"/>
+  <meta name="apple-itunes-app" content="app-id=463981119">
+  <link rel="mask-icon" href="{{ MEDIA_URL }}img/favicon_monochrome.svg" color="orange">
+  
+  <script type="text/javascript" charset="utf-8">
+    window.PYTUNE = {};
+    PYTUNE.Globals = {
+      'is_authenticated'        : {{ user.is_authenticated|yesno:"true,false" }},
+      'is_anonymous'            : {{ user.is_anonymous|yesno:"true,false" }},
+      'is_premium'              : {{ user.profile.is_premium|yesno:"true,false" }},
+      'is_admin'                : {{ user.is_staff|yesno:"true,false" }},
+      'is_staff'                : {{ user.is_staff|yesno:"true,false" }},
+      'premium_expire'          : {% if user.profile.premium_expire %}new Date('{{ user.profile.premium_expire|date:"Y-m-d" }}'){% else %}null{% endif %},
+      'secret_token'            : "{{ user.profile.secret_token }}",
+      'username'                : "{{ user.username|safe }}",
+      {% if user.pk %}'user_id'                 : {{ user.pk }},{% endif %}
+      'email'                   : "{{ user.email|safe }}",
+      'MEDIA_URL'               : "{{ MEDIA_URL }}",
+      'debug'                   : {{ debug|yesno:"true,false" }}
+    };
+    PYTUNE.Flags = {
+      'start_import_from_google_reader': {{ start_import_from_google_reader|yesno:"true,false" }}
+    };
+    PYTUNE.Preferences = {
+      'unread_view'             : 0,
+      'lock_mouse_indicator'    : 300,
+      'feed_pane_size'          : {% firstof user_profile.feed_pane_size 258 %},
+      'hide_getting_started'    : {{ user_profile.hide_getting_started|yesno:"true,false" }},
+      'has_setup_feeds'         : {{ user_profile.has_setup_feeds|yesno:"true,false" }},
+      'has_found_friends'       : {{ user_profile.has_found_friends|yesno:"true,false" }},
+      'has_trained_intelligence': {{ user_profile.has_trained_intelligence|yesno:"true,false" }},
+      'story_titles_pane_size'  : 368,
+      'story_pane_anchor'       : 'west',
+      'new_window'              : 1,
+      'default_view'            : 'feed',
+      'default_order'           : 'newest',
+      'default_read_filter'     : 'all',
+      'grid_columns'            : 0,
+      'hide_read_feeds'         : 0,
+      'show_tooltips'           : 1,
+      'show_contextmenus'       : 1,
+      'feed_order'              : 'ALPHABETICAL',
+      'keyboard_verticalarrows' : 'story',
+      'keyboard_horizontalarrows': 'view',
+      'space_scroll_spacing'    : 40,
+      'arrow_scroll_spacing'    : 100,
+      'space_bar_action'        : 'next_unread',
+      'ssl'                     : 0,
+      'open_feed_action'        : 'newest',
+      'read_story_delay'        : 0,
+      'feed_view_single_story'  : 0,
+      'animations'              : true,
+      'dateformat'              : "12",
+      'folder_counts'           : false,
+      'send_emails'             : {{ user_profile.send_emails|yesno:"true,false" }},
+      'email_cc'                : true,
+      'view_settings'           : {},
+      'story_layout'            : 'split',
+      'collapsed_folders'       : [],
+      'story_styling'           : 'sans-serif',
+      'feed_size'               : 'm',
+      'story_size'              : 'm',
+      'story_line_spacing'      : 'm',
+      'hide_public_comments'    : false,
+      'story_button_placement'  : "right",
+      'timezone'                : "{{ user_profile.timezone }}",
+      'title_counts'            : true,
+      'full_width_story'        : false,
+      'truncate_story'          : 'social',
+      'autoopen_folder'         : false,
+      'show_content_preview'    : true,
+      'show_image_preview'      : true,
+      'mark_read_on_scroll_titles' : false,
+      'doubleclick_feed'        : 'open',
+      'doubleclick_unread'      : 'markread',
+      'mark_read_river_confirm' : true,
+      'markread_nextfeed'       : 'nextfeed',
+      'story_share_twitter'     : true,
+      'story_share_facebook'    : true,
+      'story_share_readitlater' : false,
+      'story_share_instapaper'  : true,
+      'story_share_readability' : false,
+      'story_share_email'       : true
+    };
+    PYTUNE.URLs = {
+      'google-reader-authorize' : "{% url "google-reader-authorize" %}",
+      'upload-avatar'           : "{% url "upload-avatar" %}",
+      'opml-upload'             : "{% url "opml-upload" %}",
+      'opml-export'             : "{% url "opml-export" %}",
+      'domain'                  : "{% current_domain %}",
+      'favicon'                 : "/rss_feeds/icon/{id}",
+      'delete-account'          : "{% url "profile-delete-account" %}",
+      'folder_rss'              : "/reader/folder_rss/{user_id}/{secret_token}/{unread_filter}/{folder_title}"
+    };
+    PYTUNE.Models = {};
+    PYTUNE.Collections = {};
+    PYTUNE.Views = {};
+    PYTUNE.app = {};
+  </script>
+  
+  {% comment %}
+  {% include_stylesheets "common" %}
+  {% endcomment %}
+
+  <link href="{{MEDIA_URL}}css/reader.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/modals.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/status.css" rel="stylesheet" type="text/css">
+
+  <link href="{{MEDIA_URL}}css/jquery-ui/jquery.theme.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/jquery.tipsy.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap-progressbar.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/jquery.tagit.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/highlight.css" rel="stylesheet" type="text/css">
+
+  <link href="{{MEDIA_URL}}css/chosen.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/controls.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/modals.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/payments.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/reader.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/status.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/welcome.css" rel="stylesheet" type="text/css">
+
+
+{% comment %}
+  <link href="{{MEDIA_URL}}css/jquery-theme/jquery-ui-1.7.2.custom.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap-dropdown.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap-popover.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap-progressbar.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/bootstrap-transition.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/highlight.css" rel="stylesheet" type="text/css">
+  <link href="{{MEDIA_URL}}css/vendor/jquery.tagit.css" rel="stylesheet" type="text/css">
+{% endcomment %}
+
+
+  {% if user_profile.is_premium %}
+    {% if debug %}
+        <link rel="stylesheet" type="text/css" delay="//cloud.typography.com/6565292/731824/css/fonts.css" href="" />
+    {% else %}
+        <link rel="stylesheet" type="text/css" delay="//cloud.typography.com/6565292/711824/css/fonts.css" href="" />
+    {% endif %}
+  {% endif %}
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8371683-2']);
+    _gaq.push(['_setDomainName', "{% current_domain %}"]);
+    _gaq.push(['_trackPageview']);
+  </script>
+  
+  {% if not debug %}
+  <script type="text/javascript">
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  {% endif %}
+</head>
+
+<body class="{% block bodyclass %}{% endblock %} {% if user.is_staff %}NB-staff{% endif %} {% if user_profile.is_premium %}NB-premium{% endif %}">
+
+  {% block header %}{% endblock %}
+
+  <div class="NB-body-inner">
+      <div class="NB-splash-info NB-splash-top">
+        <a href="{% url "index" %}"><img class="NB-splash-title" src="{{ MEDIA_URL }}/img/logo_pytune_blur.png" /></a>
+      </div>
+  
+      {% block content %}{% endblock %}
+      
+      {% block footer %}
+        {% render_footer "welcome" %}
+      {% endblock footer %}
+      
+  </div>
+  
+  {% block head_js %}
+    {% comment %}
+    {% include_javascripts "common" %}
+    {% endcomment %}
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery-2.0.3.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.browser.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.json.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.easing.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.pytune.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.scrollTo.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.corners.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ajaxupload.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ajaxmanager.3.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.simplemodal-1.3.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.color.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.core.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.widget.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.mouse.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.position.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.draggable.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.sortable.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.slider.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.menu.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.autocomplete.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.ui.progressbar.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.cookie.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.layout.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.tinysort.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.fieldselection.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.tipsy.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.autosize.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.chosen.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.effects.core.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.effects.slideOffscreen.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/date.format.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/tag-it.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/chart.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/audio.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/socket.io-client.0.9.11.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/inflector.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/underscore-1.4.3.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/underscore.string.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/backbone-1.0.0.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/bootstrap-transition.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/highlight.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/fitvid.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_utils.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_popover.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/common/assetmodel.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/common/generate_bookmarklet.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/common/modal.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/common/router.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/comments.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/feeds.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/folders.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/social_subscription.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/starred_counts.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/stories.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/users.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/dashboard_search.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_badge_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_list_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_options_popover.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_search_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_selector.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/feed_title_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/folder_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/interactions_popover.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/module_follow_requests.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/original_tab_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/profile_badge_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/profile_thumb.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/sidebar_header_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/sidebar.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_comment_reply_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_comments_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_comment_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_detail_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_list_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_options_popover.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_save_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_share_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_sideoptions_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_tab_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_titles_header_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_titles_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_title_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/text_tab_view.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/unread_count_view.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_account.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_add_feed.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_admin.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_classifier.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_feedchooser.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_feed_exception.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_friends.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_goodies.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_intro.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_keyboard.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_mark_read.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_organizer.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_popover.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_preferences.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_profile_editor.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_recommend_feed.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_send_email.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_social_profile.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_statistics.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_taskbar_info.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_tutorial.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/reader/reader_utils.js"></script>
+
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/welcome/welcome.js"></script>
+  {% endblock head_js %}
+
+
+  <script type="text/javascript" charset="utf-8">
+    _.extend(PYTUNE.Preferences, {% if user_profile.preferences %}{{ user_profile.preferences|safe }}{% else %}{}{% endif %});
+    _.extend(PYTUNE.Preferences['view_settings'], {% if user_profile.view_settings %}{{ user_profile.view_settings|safe }}{% else %}{}{% endif %});
+    _.extend(PYTUNE.Preferences['collapsed_folders'], {% if user_profile.collapsed_folders %}{{ user_profile.collapsed_folders|safe }}{% else %}[]{% endif %});
+    
+  </script>
+
+  {% block extra_head_js %}
+  {% endblock extra_head_js %}
+  
+</body>
+</html>

@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% load recommendations_tags utils_tags statistics_tags %}
+
+{% block extra_head_js %}
+    <script>
+        $(document).ready(function() {
+
+            PYTUNE.reader = new PYTUNE.Reader();
+            PYTUNE.reader.init({
+                hide_sidebar: true
+            });
+
+            PYTUNE.welcome = new PYTUNE.Welcome();
+        });
+    </script>
+{% endblock %}
+
+{% block bodyclass %}NB-welcome{% endblock %}
+
+{% block header %}
+    {% render_feeds_skeleton %}
+{% endblock header %}
+
+{% block content %}
+
+<div class="NB-welcome-container NB-splash">
+    
+    <div class="NB-welcome-header">
+        <div class="NB-background">
+        <div class="NB-inner">
+            <div class="NB-welcome-header-logo">
+                <a href="/"><img src="{{ MEDIA_URL }}img/logo_512.png" class="NB-module-logo-image" style="height: 128px;" /></a>
+            </div>
+            <div class="NB-welcome-header-tagline">
+                <span style="font-size:24px;">PyTune is a personal news reader</span><br /><span style="font-size: 17px;color: #FBDB9B">bringing people together to talk about the world</span>
+            </div>
+            <div class="NB-welcome-header-captions">
+                <div class="NB-welcome-header-caption NB-1 {% if not post_request %}NB-active{% endif %}" data-ss="1"><span>Web</span></div>
+                <div class="NB-welcome-header-caption NB-2" data-ss="2"><span>iPad &amp; iPhone</span></div>
+                <div class="NB-welcome-header-caption NB-3" data-ss="3"><span>Android</span></div>
+                <div class="NB-welcome-header-caption NB-welcome-header-caption-signin {% if post_request %}NB-active{% endif %}"><span>Sign in</span></div>
+            </div>
+            <div class="NB-welcome-header-actions">
+                <div class="NB-welcome-header-action">
+                    <div class="NB-welcome-header-action-subtext">First</div>
+                    <div class="NB-button NB-button-tryout">
+                        <img src="{{ MEDIA_URL }}img/welcome/04-eye@2x.png" style="width: 20px; height: 13px; margin-top: 2px">
+                        Try out PyTune
+                    </div>
+                </div>
+                <div class="NB-welcome-header-action">
+                    <div class="NB-welcome-header-action-subtext">Then</div>
+                    <div class="NB-button NB-button-login">
+                        <img src="{{ MEDIA_URL }}img/welcome/09-lightning@2x.png" class="NB-welcome-header-action-bolt" style="width: 12px; height: 18px; margin-bottom: -2px">
+                        <img src="{{ MEDIA_URL }}img/reader/32-Arrow-Right.png" class="NB-welcome-header-action-arrow">
+                        Sign up or Log in
+                    </div>
+                </div>
+            </div>
+            <div class="NB-welcome-header-image {% if not post_request %}NB-active{% endif %}">
+                <img src="{{ MEDIA_URL }}img/welcome/header-web.png" class="NB-1">
+                <img src="{{ MEDIA_URL }}img/welcome/header-ios.png" class="NB-2">
+                <img src="{{ MEDIA_URL }}img/welcome/header-android.png" class="NB-3">
+            </div>
+
+            <div class="NB-welcome-header-account {% if post_request %}NB-active{% endif %}">
+                <div class="NB-account-header">
+                    <div class="NB-module-header-login">Log in</div>
+                    <div class="NB-module-header-signup">Sign up</div>
+                </div>
+                <div class="NB-login">
+                    <form method="post" action="{% url "welcome-login" %}">
+                        {% csrf_token %}
+
+                        <div>
+                            {{ login_form.username.label_tag }}
+                            {{ login_form.username }}
+                        </div>
+                        <div>
+                            <div class="NB-signup-optional">
+                                {% if login_form.errors and login_form.errors|length %}
+                                    <a href="{% url "profile-forgot-password" %}" class="NB-splash-link">Forgot?</a>
+                                {% else %}
+                                    Optional
+                                {% endif %}
+                            </div>
+                            {{ login_form.password.label_tag }}
+                            {{ login_form.password }}
+                        </div>
+                        <input name="submit" type="submit" class="NB-modal-submit-button NB-modal-submit-green" value="log in" />
+                        <input type="hidden" name="next" value="/" />
+                    </form>
+                    {% if login_form.errors %}
+                        {% for field, error in login_form.errors.items %}
+                            {{ error|safe }}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            
+                <div class="NB-signup">
+                    <form method="post" action="{% url "welcome-signup" %}">
+                        {% csrf_token %}
+
+                        <div>
+                            {{ signup_form.username.label_tag }}
+                            {{ signup_form.username }}
+                        </div>
+                        <div class="NB-signup-hidden">
+                            <div class="NB-signup-optional">Optional</div>
+                            {{ signup_form.password.label_tag }}
+                            {{ signup_form.password }}
+                        </div>
+                        <div class="NB-signup-hidden">
+                            {{ signup_form.email.label_tag }}
+                            {{ signup_form.email }}
+                        </div>
+
+                        <input name="submit" type="submit" class="NB-modal-submit-button NB-modal-submit-green" value="create account" />
+                        <input type="hidden" name="next" value="/" />
+                    </form>
+                    {% if signup_form.errors %}
+                        {% for field, error in signup_form.errors.items %}
+                            {{ error|safe }}
+                        {% endfor %}
+                    {% else %}
+                        <img src="{{ MEDIA_URL }}img/welcome/fleuron.png" style="width: 36px; height: 36px; opacity: .35; margin: 24px auto; display: block">
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        </div>
+    </div>
+    
+    <div class="NB-welcome-features">
+        <div class="NB-inner">
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_1.png">
+                <div class="NB-feature-caption">Real-time RSS</div>
+                <div class="NB-feature-text">Stories are pushed directly to you, so you can read news as it comes in.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_2.png">
+                <div class="NB-feature-caption">Original site</div>
+                <div class="NB-feature-text">Read the content in context, the way it was meant to be seen.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_3.png">
+                <div class="NB-feature-caption">Shared stories</div>
+                <div class="NB-feature-text">Reading news is better with friends. Share stories on your public pytuneblog.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_4.png">
+                <div class="NB-feature-caption">Training</div>
+                <div class="NB-feature-text">Hide the stories you don't like and highlight the stories you do.</div>
+            </div>
+        </div>    
+    </div>
+    
+    <div class="NB-welcome-features">
+        <div class="NB-inner">
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_5.jpg">
+                <div class="NB-feature-caption">Full Text Search</div>
+                <div class="NB-feature-text">Quickly find stories across all of your subscriptions.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_6.png">
+                <div class="NB-feature-caption">Story Tagging</div>
+                <div class="NB-feature-text">Save stories with custom tags for fast references.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_7.jpg">
+                <div class="NB-feature-caption">Pytuneblog Privacy</div>
+                <div class="NB-feature-text">Share stories with the world or only with your friends.</div>
+            </div>
+            <div class="NB-feature">
+                <img src="{{ MEDIA_URL }}img/welcome/feature_8.jpg">
+                <div class="NB-feature-caption">Third-party Apps</div>
+                <div class="NB-feature-text">Supports <a href="http://reederapp.com" class="NB-splash-link" target="_blank">Reeder</a>, <a href="http://readkitapp.com" class="NB-splash-link" target="_blank">ReadKit</a>, <a href="http://supertop.co/unread/" class="NB-splash-link" target="_blank">Unread</a>, and loads more.</div>
+            </div>
+        </div>    
+    </div>
+
+    <div class="NB-welcome-pricing">
+        <div class="NB-inner">
+            <h2>Pricing</h2>
+            <p>PyTune is free on the web, iPad, iPhone, and Android. By subscribing to a <br> premium account, you support a growing service and unlock a few restrictions.</p>
+            <table class="NB-pricing">
+                <tr>
+                    <th></th>
+                    <th>Free Account</th>
+                    <th class="NB-last">
+                        <div class="NB-price">$24 / year</div>
+                        Premium Account
+                    </th>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-1"></div> Number of Sites</td>
+                    <td>Up to 64 sites</td>
+                    <td class="NB-last">Unlimited sites</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-2"></div> River of News</td>
+                    <td>Only 5 stories at a time</td>
+                    <td class="NB-last">All stories at once</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-3"></div> Site updates</td>
+                    <td>1X</td>
+                    <td class="NB-last">Up to 10X as often</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-4"></div> Search</td>
+                    <td>-</td>
+                    <td class="NB-last">Search feeds, saved, and shared stories</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-5"></div> Saved story tagging</td>
+                    <td>Only save stories</td>
+                    <td class="NB-last">Tag saved stories</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-6"></div> Privacy</td>
+                    <td>Public shares only</td>
+                    <td class="NB-last">Public, protected, and private shares</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-7"></div> Custom RSS</td>
+                    <td>-</td>
+                    <td class="NB-last">Folders (filtered), saved stories</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold"><div class="NB-welcome-premium-bullet NB-8"></div> Instant Access</td>
+                    <td>Wait in a queue</td>
+                    <td class="NB-last">Immediate</td>
+                </tr>
+                <tr>
+                    <td class="NB-bold">
+                        <div class="NB-welcome-premium-bullet NB-9"></div>
+                        Feed poor Shiloh
+                    </td>
+                    <td>She goes hungry</td>
+                    <td class="NB-last">
+                        <img src="{{ MEDIA_URL }}img/reader/shiloh.jpg" class="NB-shiloh">Home cooked meals of green beans, sweet potatoes, carrots, and brown rice</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="NB-welcome-activity">
+        <div class="NB-inner">
+            {% render_features_module %}
+            <h2>Real-time Stats</h2>
+            {% render_statistics_graphs statistics %}
+        </div>
+    </div>
+
+    <div class="NB-welcome-bottomactions">
+        <div class="NB-inner">
+            <div class="NB-welcome-header-actions">
+                <div class="NB-welcome-header-action">
+                    <div class="NB-welcome-header-action-subtext">First</div>
+                    <div class="NB-button NB-button-tryout">
+                        <img src="{{ MEDIA_URL }}img/welcome/04-eye@2x.png" style="width: 20px; height: 13px; margin-top: 2px">
+                        Try out PyTune
+                    </div>
+                </div>
+                <div class="NB-welcome-header-action">
+                    <div class="NB-welcome-header-action-subtext">Then</div>
+                    <div class="NB-button NB-button-login">
+                        <img src="{{ MEDIA_URL }}img/welcome/09-lightning@2x.png" class="NB-welcome-header-action-bolt" style="width: 12px; height: 18px; margin-bottom: -2px">
+                        <img src="{{ MEDIA_URL }}img/reader/32-Arrow-Right.png" class="NB-welcome-header-action-arrow">
+                        Sign up or Log in
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{% endblock %}
+
+{% block footer %}
+
+    <footer class="NB-welcome-footer">
+        <div class="NB-welcome-footer-content NB-inner">
+            <div class="NB-footer-icons">
+                <a href="https://github.com/Einsteinish/PyTune.git" title="GitHub"><img src="{{ MEDIA_URL }}img/welcome/github_favicon.png"></a>
+                <a href="https://twitter.com/KHongTwit" title="Twitter"><img src="{{ MEDIA_URL }}img/welcome/twitter_favicon.png"></a>
+            </div>
+            <a href="{% url "index" %}"><img src="{{ MEDIA_URL }}/img/logo_pytune_blur.png" style="height: 32px;" class="NB-footer-logo" title="PyTune" alt="PyTune" /></a>
+            is built in San Francisco by 
+            <a href="https://twitter.com/KHongTwit" class="NB-splash-link">
+                <img src="https://pbs.twimg.com/profile_images/731993784171397120/SKpL9D5p.jpg" class="NB-twitter-avatar">
+                @KHong
+            </a>
+        </div>
+
+        {% render_footer "welcome" %}
+        
+    </footer>
+{% endblock footer %}

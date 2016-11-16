@@ -1,0 +1,27 @@
+{
+    "version": "1.0",
+    "name": "PyTune",
+    "description": "PyTune is a personal news reader that brings people together to talk about the world. A new sound of an old instrument.",
+    "icons": {
+        "16": "/media/img/favicon.png",
+        "48": "/media/img/logo_128.png",
+        "128": "/media/img/logo_128.png"
+    },
+    "developer": {
+        "name": "K Hong",
+        "url": "http://www.pytune.com"
+    },
+    "installs_allowed_from": [
+        "*",
+        "https://marketplace.firefox.com",
+        "https://marketplace.mozilla.org",
+        "http://www.pytune.com",
+        "http://dev.pytune.com",
+        "http://pytune.com",
+        "https://www.pytune.com",
+        "https://dev.pytune.com",
+        "https://pytune.com"
+    ],
+    "locales": {},
+    "default_locale": "en"
+}

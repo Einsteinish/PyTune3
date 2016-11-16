@@ -1,0 +1,4 @@
+#!/bin/sh
+kill -HUP `cat ~/pytune/logs/gunicorn.pid`
+echo '----\n'
+tail -f ~/pytune/logs/pytune.log

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div id="NB-splash">
+
+
+  <div class="NB-account">
+    {% if not user.is_authenticated %}
+      
+      <div class="NB-module">
+        <h5>
+          <div class="NB-module-header-signup">Signup</div>
+        </h5>
+
+        <div class="NB-import-signup" style="margin-top: 24px;">
+          <form method="post" action="{% url "import-signup" %}">
+            <div>
+              {{ signup_form.username.label_tag }}
+              {{ signup_form.username }}
+            </div>
+            <div class="">
+              <div class="NB-signup-optional">Optional</div>
+              {{ signup_form.password.label_tag }}
+              {{ signup_form.password }}
+            </div>
+            <div class="">
+              {{ signup_form.email.label_tag }}
+              {{ signup_form.email }}
+            </div>
+
+            <input name="submit" type="submit" value="create account" />
+            <input type="hidden" name="next" value="/" />
+          </form>
+          
+          {% if signup_form.errors %}
+            {% for field, error in signup_form.errors.items %}
+              {{ error }}
+            {% endfor %}
+          {% endif %}
+      
+        </div>
+        
+        <div class="NB-signup NB-import-signup-text">
+          <h3>Almost There!</h3>
+          <p>To complete the import,<br />just choose a username.</p>
+        </div>
+        
+      </div>
+      
+      
+    {% endif %}
+  
+    
+  </div>
+
+
+</div>
+
+{% endblock %}

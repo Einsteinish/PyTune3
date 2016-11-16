@@ -1,0 +1,309 @@
+{% load utils_tags social_tags %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{ social_profile.title }}</title>
+    <link rel="alternate" type="application/rss+xml" href="{% url "shared-stories-rss-feed" social_profile.user_id social_profile.username|slugify %}" title="{{ social_profile.feed_title }} RSS feed">
+    {% if social_profile.photo_url %}
+    <link rel="shortcut icon" href="{{ social_profile.photo_url }}">
+    <link rel="icon" href="{{ social_profile.photo_url }}">
+    {% endif %}
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1.5">
+    <link rel="apple-touch-icon" href="{{ MEDIA_URL }}img/circular/circular_apple_icon.png"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />  
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0; maximum-scale=1.0, user-scalable=no" />
+    
+    {% if active_story %}
+        <!-- Facebook -->
+        <meta property="fb:app_id"               content="{{ facebook_app_id }}"> 
+        <meta property="og:type"                 content="website"> 
+        <meta property="og:url"                  content="{{ active_story.pytuneblog_permalink }}">
+        {% if active_story.feed %}
+        <meta property="og:site_name"            content="{{ active_story.feed.feed_title }}">
+        {% endif %}
+        {% if active_story.image_url %}
+        <meta property="og:image"                content="{{ active_story.image_url }}">
+        {% endif %}
+        <meta property="og:title"                content="{{ active_story.story_title }}">
+        <meta property="og:description"          content="{{ active_story.story_content|striptags|slice:":300"|addslashes|safe }}"> 
+        <meta property="article:published_time"  content="{{ active_story.iso8601 }}"> 
+        <meta property="article:author"          content="{{ active_story.story_authors }}">
+        <meta property="article:tag"             content="{{ active_story.tags }}">    
+
+        <!-- Twitter -->
+        {% if active_story.image_url %}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image:src" content="{{ active_story.image_url }}">
+        {% else %}
+        <meta name="twitter:card" content="summary">
+        {% endif %}
+        <meta name="twitter:site" content="@KHong">
+        {% if social_services.twitter_username %}
+        <meta name="twitter:creator" content="@{{ social_services.twitter_username }}">
+        {% endif %}
+        <meta name="twitter:title" content="{{ active_story.story_title }}">
+        <meta name="twitter:description" content="{{ active_story.story_content|striptags|slice:":300"|addslashes|safe }}">
+    {% endif %}
+    
+    {% comment %}
+    {% include_stylesheets "pytuneblog" %}
+    {% comment %}
+    <link href="{{MEDIA_URL}}css/jquery.tipsy.css" rel="stylesheet" type="text/css">
+    <link href="{{MEDIA_URL}}css/vendor/bootstrap-popover.css" rel="stylesheet" type="text/css">
+    <link href="{{MEDIA_URL}}css/vendor/bootstrap-transition.css" rel="stylesheet" type="text/css">
+    <link href="{{MEDIA_URL}}css/vendor/bootstrap-dropdown.css" rel="stylesheet" type="text/css">
+    <link href="{{MEDIA_URL}}css/vendor/bootstrap-progressbar.css" rel="stylesheet" type="text/css">
+    <link href="{{MEDIA_URL}}css/circular/css/social_page.css" rel="stylesheet" type="text/css">
+    
+    {% if social_profile.custom_css %}
+    <style type="text/css" media="screen">
+        {{ social_profile.custom_css|safe }}
+    </style>
+    {% endif %}
+
+    <script type="text/javascript" charset="utf-8">
+    window.PYTUNE = {};
+    PYTUNE.Globals = {
+        'is_authenticated' : {{ user.is_authenticated|yesno:"true,false" }},
+        'is_anonymous'     : {{ user.is_anonymous|yesno:"true,false" }},
+        'is_premium'       : {{ user.profile.is_premium|yesno:"true,false" }},
+        'is_admin'         : {{ user.is_staff|yesno:"true,false" }},
+        'is_staff'         : {{ user.is_staff|yesno:"true,false" }},
+        'secret_token'     : "{{ user.profile.secret_token }}",
+        'username'         : "{{ user.username|safe }}",
+        'user_id'          : "{{ user.pk|safe }}",
+        'pytuneblog_user_id' : "{{ social_profile.user_id|safe }}",
+        'pytuneblog_username' : "{{ social_profile.username|safe }}",
+        'pytuneblog_protected': {{ social_profile.protected|yesno:"true,false" }},
+        'pytuneblog_following': {{ user_following_social_profile|yesno:"true,false" }},
+        'email'            : "{{ user.email|safe }}",
+        'MEDIA_URL'        : "{{ MEDIA_URL }}",
+    };
+    PYTUNE.URLs = {
+        "pytune_page": "http://{% current_domain %}/social/{{ social_profile.user_id }}/{{ social_profile.username|slugify }}"
+    };
+    {% if user_social_profile_page %}
+        PYTUNE.user_social_profile = {{ user_social_profile_page|safe }};
+    {% endif %}
+    {% if user_social_services_page %}
+        PYTUNE.user_social_services = {{ user_social_services_page|safe }};
+    {% endif %}
+    PYTUNE.Preferences = {};
+    PYTUNE.Models = {};
+    PYTUNE.Collections = {};
+    PYTUNE.Views = {};
+    PYTUNE.app = {};
+    </script>
+    
+  {% if not debug %}
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-8371683-2']);
+    _gaq.push(['_setDomainName', "{{ social_profile.username }}.pytune.com"]);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  {% endif %}
+
+</head>
+
+<body class="{% if user.is_authenticated %}NB-authenticated{% else %}NB-unauthenticated{% endif %}">
+<div class="NB-container" style="background-color: {% if social_profile.custom_bgcolor %}{{ social_profile.custom_bgcolor|color2rgba:".3 " }}{% else %}rgba(195, 197, 161, .3){% endif %}">
+    
+<header class="NB-header">
+    <div class="NB-header-inner">
+        <div class="NB-header-tabs">
+            <a class="NB-header-tab NB-pytuneblog-tab {% if current_tab == "pytuneblogs" %}NB-active{% endif %}" href="{% if user_social_profile %}{{ user_social_profile.pytuneblog_url }}{% endif %}">
+                <div class="NB-tab-inner">
+                    <span class="NB-icon"></span>
+                    Pytuneblogs
+                </div>
+            </a>
+            <a class="NB-header-tab NB-following-tab {% if current_tab == "global" %}NB-active{% endif %}" href="http://popular.global.{% current_domain strip_www=True %}">
+                <div class="NB-tab-inner">
+                    <span class="NB-icon"></span>
+                    Global
+                </div>
+            </a>
+            <a class="NB-header-tab NB-trending-tab {% if current_tab == "popular" %}NB-active{% endif %}" href="http://popular.{% current_domain strip_www=True %}">
+                <div class="NB-tab-inner">
+                    <span class="NB-icon"></span>
+                    Popular
+                </div>
+            </a>
+            {% if user.is_authenticated %}
+                <div class="NB-header-tab NB-user-tab dropdown" data-toggle="dropdown">
+                    <div class="NB-tab-inner">
+                        <span><img src="{{ user_social_profile.large_photo_url }}" class="NB-user-avatar" /></span>
+                        <img src="{{ MEDIA_URL }}img/icons/silk/bullet_arrow_down.png" class="NB-arrow" />
+                        {{ user_social_profile.username }}
+                    </div>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="http://{% current_domain %}/social/{{ social_profile.user_id }}/{{ social_profile.username|slugify }}" class="NB-menu-pytune">View on PyTune</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" class="NB-menu-logout">Logout</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <a class="NB-header-tab NB-user-tab" href="#">
+                    <div class="NB-tab-inner">
+                        <span class="NB-icon"></span>
+                        <img src="{{ MEDIA_URL }}img/icons/silk/bullet_arrow_down.png" class="NB-arrow" />
+                        Log in
+
+                    </div>
+                    <div class="NB-circular-popover-title NB-hidden">
+                        <div class="NB-login">
+                            <input type="text" placeholder="Username or email" name="login_username" class="NB-input" />
+                            <input placeholder="Password" type="password" name="login_password" class="NB-input" />
+                            <div class="NB-login-button NB-blue-button">Sign in</div>
+                        </div>
+                        <div class="NB-signup">
+                            <input type="text" placeholder="Username" name="signup_username" class="NB-input" />
+                            <input type="text" placeholder="Email address" name="signup_email" class="NB-input" />
+                            <input placeholder="Password" type="password" name="signup_password" class="NB-input" />
+                            <div class="NB-signup-button NB-blue-button">Create account</div>
+                        </div>
+                    </div>
+                    <div class="NB-circular-popover-content NB-hidden">
+                        <div class="NB-switch-button NB-switch-signup-button NB-grey-button">Create an account</div>
+                        <div class="NB-switch-button NB-switch-login-button NB-grey-button">Log in</div>
+                        <div class="NB-arrow"></div>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="NB-banner-wrapper">
+    <div class="NB-banner NB-page">
+        <table class="NB-banner-table">
+            <tr>
+                <td class="NB-title-photo">
+                    <a href="/">
+                        <img src="{{ social_profile.large_photo_url }}" />
+                    </a>
+                    {% if user.is_authenticated %}
+                        <div class="NB-banner-following-user">
+                            {% if user_following_social_profile %}
+                                {% if social_profile.user_id != user.pk %}
+                                    <div class="NB-button NB-grey-button NB-button-following">Following</div>
+                                {% endif %}
+                            {% else %}
+                                <div class="NB-button NB-blue-button NB-button-follow">Follow {{ social_profile.username }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </td>
+                <td class="NB-title">
+                    <div class="NB-title-content">
+                        <div class="NB-title-name">
+                            <a href="http://{% current_domain %}/social/{{ social_profile.user_id }}/{{ social_profile.username|slugify }}">{{ social_profile.title }}</a>
+                        </div>
+                        {% if social_profile.bio %}
+                            <div class="NB-title-bio">
+                                {{ social_profile.bio }}
+                            </div>
+                        {% endif %}
+                        <div class="NB-banner-stats">
+                            <div class="NB-banner-stat"><b>{{ social_profile.shared_stories_count }}</b> {{ social_profile.shared_stories_count|pluralize:"story,stories" }}</div>
+                            <div class="NB-banner-stat"><b>&middot;</b></div>
+                            <div class="NB-banner-stat NB-stat-followers"><b>{{ social_profile.follower_count }}</b> follower{{ social_profile.follower_count|pluralize }}</div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <div class="NB-banner-feed">
+            {# <a type="application/rss+xml" href="{% url "shared-stories-rss-feed" social_profile.user_id social_profile.username|slugify %}">RSS feed for this page</a> #}
+        </div>
+    </div>
+
+</div>
+
+<div class="NB-page">
+
+    {% if not stories and social_profile.private %}
+        <div class="NB-warning-private">
+            <div class="NB-icon-lock"></div>
+            This user has limited their shared stories only to followers.
+        </div>
+    {% endif %}
+    
+    {% for story in stories %}
+        {% render_social_story story %}
+    {% endfor %}
+
+</div>
+
+{% if has_next_page %}
+    <div class="NB-page-controls">
+        <div class="NB-page-controls-next">
+            <div class="NB-page-controls-text NB-page-controls-text-next">
+                Next Page of Stories
+            </div>
+            <div class="NB-page-controls-text NB-page-controls-text-loading"></div>
+            <div class="NB-page-controls-text NB-page-controls-text-loaded">
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<footer>
+    <div class="NB-footer-logo">
+        <a href="//{% current_domain %}"><img src="{{ MEDIA_URL }}img/logo_pytune_blur.png" /></a>
+    </div>
+</footer>
+
+</div>
+
+{% comment %}
+{% include_javascripts "pytuneblog" %}
+{% endcomment %}
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery-2.0.3.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.browser.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.color.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/underscore-1.4.3.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/underscore.string.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/backbone-1.0.0.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.tipsy.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/inflector.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/bootstrap-popover.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/bootstrap-tooltip.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/bootstrap-transition.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/bootstrapx-clickover.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_assets.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_comment.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_comments.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_extensions.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_login_view.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_router.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_shares_view.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/social_page/social_page_story.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/models/comments.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_share_view.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/pytune/views/story_comment_view.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.easing.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.pytune.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/vendor/jquery.hotkeys.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+    _.extend(PYTUNE.Preferences, {% if user_profile.preferences %}{{ user_profile.preferences|safe }}{% else %}{}{% endif %});
+</script>
+
+</body>
+
+</html>

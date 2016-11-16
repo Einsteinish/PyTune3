@@ -1,0 +1,17 @@
+{% extends "mail/email_base.txt" %}
+
+{% load utils_tags %}
+
+{% block body %}Welcome to PyTune, {{ user.username }}.
+
+OK, firstly, thank you for trying out PyTune. I've worked hard to make a great app, so congratulations on discovering a handcrafted experience.
+
+Here are some easy ways to have a great time on PyTune:
+
+    * Follow friends from Twitter, Facebook, and PyTune: http://{% current_domain %}{{ user.profile.autologin_url }}?next=friends
+    * Visit the popular pytuneblog, The People Have Spoken: http://popular.pytune.com
+    * Upgrade to a premium account for only $24/year: http://{% current_domain %}{{ user.profile.autologin_url }}?next=chooser
+
+Spend a few days trying out PyTune. I hope you love it.
+
+- Sam Clay{% endblock body %}

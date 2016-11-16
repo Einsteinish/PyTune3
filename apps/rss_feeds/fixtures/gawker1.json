@@ -1,0 +1,33 @@
+[
+    {
+        "pk": 1, 
+        "model": "rss_feeds.feed", 
+        "fields": {            
+            "premium_subscribers": -1,
+            "creation": "2011-08-27",
+            "exception_code": 0,
+            "last_load_time": 0,
+            "active_subscribers": 1,
+            "feed_address": "%(PYTUNE_DIR)s/apps/rss_feeds/fixtures/gawker1.xml", 
+            "feed_link": "%(PYTUNE_DIR)s/apps/rss_feeds/fixtures/gawker1.html", 
+            "feed_link_locked": true,  
+            "last_update": "2011-08-27 02:45:21",
+            "etag": null,
+            "average_stories_per_month": 0,
+            "feed_title": "Gawker",
+            "last_modified": null,
+            "next_scheduled_update": "2011-08-28 14:33:50",
+            "favicon_color": null,
+            "stories_last_month": 0,
+            "active": true,
+            "favicon_not_found": false,
+            "has_page_exception": false,
+            "fetched_once": false,
+            "days_to_trim": 90,
+            "num_subscribers": 1,
+            "last_story_date": "2011-08-28 00:03:50",
+            "min_to_decay": 720,
+            "has_feed_exception": false
+        }
+    }
+]

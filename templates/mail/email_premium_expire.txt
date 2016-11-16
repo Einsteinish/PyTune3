@@ -1,0 +1,11 @@
+{% extends "mail/email_base.txt" %}
+
+{% load utils_tags %}
+
+{% block body %}Hey {{ user.username }}, your premium account has just expired.
+
+You now have a free account with all the limitations of a free account. But that doesn't mean you can't renew your premium subscription and enjoy the many benefits of using PyTune.
+
+Renew now: http://{% current_domain %}{{ user.profile.autologin_url }}?next=chooser
+
+Spend a few days trying out PyTune again. We hope you love it.{% endblock body %}

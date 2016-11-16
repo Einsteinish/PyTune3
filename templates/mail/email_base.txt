@@ -1,0 +1,25 @@
+{% load utils_tags %}{% block body %}{% endblock body %}
+
+-----------------------------------------------------------------------------
+
+PyTune is a personal news reader that brings people together to talk about the world. A new sound of an old instrument.
+
+Stay up to date and in touch with a few different ways:
+
+    * Follow @pytune on Twitter: http://twitter.com/pytune/
+    * Follow @pytune on GitHub: https://github.com/Einsteinish/
+
+{% block resources_header %}To get the most out of PyTune, here are a few resources:{% endblock resources_header %}
+
+    * Read the PyTune Blog: http://blog.pytune.com
+    * Get support on PyTune's Get Satisfaction: http://getsatisfaction.com/pytune/
+
+There are plenty of ways to use PyTune beyond the website:
+
+    * Download the free iPad/iPhone App: http://{% current_domain %}/ios/
+    * Download the free Android App: http://{% current_domain %}/android/
+    * Download browser extensions for Safari, Firefox, and Chrome: http://{% current_domain %}{{ user.profile.autologin_url }}?next=goodies
+
+-----------------------------------------------------------------------------
+
+Don't want to be notified about anything PyTune related? Opt-out of emails from PyTune: http://{% current_domain %}{{ user.profile.autologin_url }}?next=optout

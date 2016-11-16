@@ -1,0 +1,17 @@
+{% extends "mail/email_base.xhtml" %}
+
+{% load utils_tags %}
+
+{% block body %}
+    
+    <p style="line-height: 20px;">
+        {% if reason %}{{ reason }}{% else %}Here's a backup of your sites on PyTune.{% endif %} It contains <b>{{ feed_count }}</b> 
+        site{{ feed_count|pluralize }}.
+    </p>
+    
+    <p style="line-height: 20px;">
+        You can re-upload the attached file to PyTune and get all of your sites back. <br />
+        Just go to Manage > Import > Upload OPML.
+    </p>
+    
+{% endblock %}

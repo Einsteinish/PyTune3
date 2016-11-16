@@ -1,0 +1,1165 @@
+- authentication:
+    - url: /api/login
+      method: POST
+      short_desc: "Login as an existing user."
+      long_desc: 
+        - "Login as an existing user."
+      tips:
+        - >
+          If a user has no password set, you cannot just send any old password. 
+          This is not <a href="http://www.instapaper.com/api/full">Instapaper</a>.
+      params:
+        - key: username
+          desc: "Username"
+          required: true
+          example: "khong"
+        - key: password
+          desc: "Password"
+          optional: true
+          example: "pytune"
+    - url: /api/logout
+      method: POST
+      short_desc: "Logout the currently logged in user."
+      long_desc: 
+        - "Logout the currently logged in user."
+    - url: /api/signup
+      method: POST
+      short_desc: "Create a new user."
+      long_desc: 
+        - "Create a new user."
+      params:
+        - key: username
+          desc: "Username"
+          required: true
+          example: "khong"
+        - key: password
+          desc: "Password"
+          optional: true
+          example: "pytune"
+        - key: email
+          desc: "Email address"
+          required: true
+          example: "kihyuckhong@gmail.com"
+        
+- feeds:
+    - url: /rss_feeds/search_feed
+      method: GET
+      short_desc: "Information about a feed from its address."
+      long_desc: 
+        - "Retrieve information about a feed from its website or RSS address."
+      params:
+        - key: address
+          desc: "Searches the RSS and website address and returns a feed."
+          required: true
+          example: 'techcrunch.com'
+        - key: offset
+          desc: "Try paging through feeds found by using the offset."
+          optional: true
+          example: 1
+          
+    - url: /reader/feeds
+      method: GET
+      short_desc: "User's feeds, with unread counts, meta data, and optional favicons."
+      long_desc: 
+        - "Retrieve a list of feeds to which a user is actively subscribed."
+        - "Includes the 3 unread counts (positive, neutral, negative), as well as optional favicons."
+      tips:
+        - "Use <code>/reader/refresh_feeds</code> to get updated unread counts."
+        - >
+          Turn off <code>include_favicons</code> if you can either cache favicons 
+          or can wait to fetch them.
+      params:
+        - key: include_favicons
+          desc: >
+            Include favicons inline. Since they can be time consuming to download, 
+            you can optionally turn them off. Use /api/v1/feeds/favicons/ to 
+            retrieve the favicons in a separate request.
+          optional: true
+          default: "false"
+          example: "true/false"
+        - key: flat
+          desc: >
+            Returns a flat folder structure instead of nested folders. Useful 
+            when displaying all folders in a single depth without recursive descent.
+          optional: true
+          default: "false"
+          example: "true/false"
+        - key: update_counts
+          desc: >
+            Forces recalculation of unread counts on all feeds. The preferred method is
+            to call this endpoint without updated counts, then call refresh_feeds to get
+            updated counts. That way you can quickly show the user's feeds, then update
+            the counts. Turning this option on will lead to a slower load-time.
+          optional: true
+          default: "false"
+          example: "true/false"
+        
+    - url: /reader/favicons
+      method: GET
+      short_desc: "Favicons for each of a user's feeds."
+      long_desc: 
+        - >
+          Retrieve a list of favicons for a list of feeds. Used when combined 
+          with <code>/reader/feeds</code> and <code>include_favicons=false</code>, 
+          so the feeds request contains far less data. Useful for mobile devices, 
+          but requires a second request.
+      tips:
+        - >
+          To use inline data images, you can use this syntax:
+          <pre><code>&lt;img src="data:image/png;base64,[IMAGE_DATA_STRING]" /&gt;</code></pre>
+      params:
+        - key: feed_ids
+          desc: " Array of feed ids. Leave empty to retrieve all active (enabled) feeds."
+          optional: true
+          example: "feed_ids=12&feed_ids=24"
+  
+    - url: /reader/page/:id
+      method: GET
+      short_desc: "Original page from a single feed."
+      long_desc: 
+        - "Retrieve the original page from a single feed."
+
+    - url: /reader/refresh_feeds
+      method: GET
+      short_desc: "Get latest unread counts for active feeds."
+      long_desc: 
+        - "Up-to-the-second unread counts for each active feed."
+        - "Poll for these counts no more than once a minute."
+        
+    - url: /reader/feeds_trainer
+      method: GET
+      short_desc: "Get all popular and known intelligence classifiers."
+      long_desc: 
+        - "Retrieves all popular and known intelligence classifiers."
+        - "Also includes user's own classifiers."
+      tips:
+        - "If you only want a user's classifiers, use <code>/classifiers/:id</code>."
+        - "Omit the feed_id to get all classifiers for all subscriptions."
+      params:
+        - key: feed_id
+          desc: >
+            Only use a single feed. Omit this to get the classifiers for all feeds at once.
+          optional: true
+          example: "42"
+  
+    - url: /rss_feeds/statistics/:id
+      method: GET
+      short_desc: "Get statistics and history for a feed."
+      long_desc: 
+        - "Statistics and history for a feed."
+        - >
+          Includes feed update frequencies, frequency distribution of intelligence
+          classifiers, average stories per month over the life of the feed, and 
+          the last five feed and page fetches.
+  
+    - url: /rss_feeds/feed_autocomplete
+      method: GET
+      short_desc: "Get a list of feeds that contain a phrase."
+      long_desc: 
+        - "Get a list of feeds that contain a search phrase."
+        - "Searches by feed address, feed url, and feed title, in that order."
+        - "Will only show sites with 2+ subscribers."
+      params:
+        - key: term
+          desc: "Phrase to search for in feed address, url, and title."
+          optional: true
+          example: "tech"
+
+
+- stories:
+    - url: /reader/feed/:id
+      method: GET
+      short_desc: "Stories from a single feed."
+      long_desc: 
+        - "Retrieve stories from a single feed."
+      params:
+        - key: page
+          desc: "Page of stories, starting from 1."
+          optional: true
+          default: 1
+          example: 2
+        - key: order
+          desc: "Story order by oldest or newest first"
+          optional: true
+          default: newest
+          example: oldest
+        - key: read_filter
+          desc: "Show all stories or only unread stories"
+          optional: true
+          default: all
+          example: unread
+        - key: include_hidden
+          desc: >
+            Use this if you want to show hidden stories (provided you have a "Show Hidden 
+            Stories" button). All native PyTune apps (web, ios, android) use this.
+          optional: true
+          default: "false"
+          example: "true"
+        - key: include_story_content
+          desc: >
+            If you're just checking for story ids and meta-data, you don't
+            need the story content, thus reducing bandwidth.
+          optional: true
+          default: "true"
+          example: "false"
+      tips:
+        - >
+          The story score (red, neutral, green) can be computed by following 
+          the function <a href="https://github.com/Einsteinish/PyTune/blob/master/media/js/pytune/reader/reader_utils.js"> <code>compute_story_score</code> in reader_utils.js on GitHub</a>. Alternatively, you can use the <code>score</code> parameter.
+        - > 
+            Counts are broken into three. Add them up for a total, but you shouldn't show or count the hidden stories:
+            <ul>
+            <li> <code>ps</code>: positive/focus count</li>
+            <li> <code>nt</code>: neutral/unread count</li>
+            <li> <code>ng</code>: negative/hidden count</li>
+            </ul>
+        - >
+            If you aren't including hidden stories and a user has many stories that are hidden (which happens quite often as they might thumbs down the publisher but thumbs up a title or tag), then make sure to keep paging if the <code>hidden_stories_count</code> is non-zero. Don't rely on the <code>stories</code> list being empty to assume that's when to stop paging.
+  
+    - url: /reader/starred_stories
+      method: GET
+      short_desc: "User's starred stories."
+      long_desc: 
+        - "Retrieve a user's starred stories."
+      params:
+        - key: page
+          desc: "Page of starred stories, starting from 1."
+          optional: true
+          default: 1
+          example: 2
+        - key: h
+          desc: "Pass up to 100 story_hashes. Use with starred_story_hashes."
+          optional: true
+          example: "h=a1b2c3&h=d4e5f6"
+
+    - url: /reader/starred_story_hashes
+      method: GET
+      short_desc: "Story hashes of starred stories."
+      long_desc: 
+        - "Retrieve the story hashes of a user's starred stories."
+      params:
+        - key: include_timestamps
+          desc: "Including timestamps for starred_date"
+          optional: true
+          default: false
+      tips:
+        - "Use with /reader/starred_stories and pass up to 100 story_hashes as the <code>h</code> param."
+  
+    - url: /reader/river_stories
+      method: GET
+      short_desc: "Stories from multiple feeds (River of News)."
+      long_desc: 
+        - "Retrieve stories from a collection of feeds. This is known as the River of News."
+        - "Stories are ordered in reverse chronological order."
+      params:
+        - key: feeds
+          desc: "Feed ids to use in the river. Usually every feed in a folder with unread stories."
+          required: true
+          example: "feeds=12&feeds=24"
+        - key: page
+          desc: "Page of stories, starting from 1."
+          optional: true
+          default: 1
+          example: 2
+        - key: order
+          desc: "Story order by oldest or newest first"
+          optional: true
+          default: newest
+          example: oldest
+        - key: read_filter
+          desc: "Show all stories or only unread stories"
+          optional: true
+          default: unread
+          example: all
+        - key: include_hidden
+          desc: >
+            Use this if you want to show hidden stories (provided you have a "Show Hidden 
+            Stories" button). All native PyTune apps (web, ios, android) use this.
+          optional: true
+          default: "false"
+          example: "true"
+      tips:
+        - > 
+            Counts are broken into three. Add them up for a total, but you shouldn't show or count the hidden stories:
+            <ul>
+            <li> <code>ps</code>: positive/focus count</li>
+            <li> <code>nt</code>: neutral/unread count</li>
+            <li> <code>ng</code>: negative/hidden count</li>
+            </ul>
+        - >
+            If you aren't including hidden stories and a user has many stories that are hidden (which happens quite often as they might thumbs down the publisher but thumbs up a title or tag), then make sure to keep paging if the <code>hidden_stories_count</code> is non-zero. Don't rely on the <code>stories</code> list being empty to assume that's when to stop paging.
+
+
+    - url: /reader/river_stories
+      method: GET
+      short_desc: "Stories by story_hash."
+      long_desc: 
+        - "Retrieve up to 100 stories when specifying by story_hash."
+        - "Used this in conjunction with <code>unread_story_hashes</code> to store stories for offline use."
+      params:
+        - key: h
+          desc: "Pass up to 100 story_hashes. Use with unread_story_hashes."
+          required: true
+          example: "h=468:a1b2c3&h=7531:d4e5f6"
+
+    - url: /reader/unread_story_hashes
+      method: GET
+      short_desc: "The story_hashes of all unread stories."
+      long_desc: 
+        - "The story_hashes of all unread stories."
+        - "Useful for offline access of stories and quick unread syncing."
+        - "Use include_timestamps to fetch stories in date order."
+      params:
+        - key: feed_id
+          desc: "Feed ids to check. Omit to include every feed subscription."
+          optional: true
+          example: "feed_id=12&feed_id=24"
+        - key: include_timestamps
+          desc: "Including timestamps for story_date"
+          optional: true
+          default: false
+          
+    - url: /reader/read_stories
+      method: GET
+      short_desc: "Feed of previously read stories."
+      long_desc: 
+        - "Feed of previously read stories."
+      params:
+        - key: page
+          desc: "Page of stories, starting from 1."
+          optional: true
+          default: 1
+          example: 2
+        - key: order
+          desc: "Story order by oldest or newest first"
+          optional: true
+          default: newest
+          example: oldest
+          
+    - url: /reader/mark_story_hashes_as_read
+      method: POST
+      short_desc: "Mark a story as read."
+      long_desc: 
+        - "Mark stories as read using their unique story_hash."
+        - "Multiple story hashes can be sent at once."
+        - "Mix and match stories from different feeds and social subscriptions."
+      tips:
+        - "Throttle requests to mark as read. You don't need to send one request per story."
+        - "Queue up to 5 stories or once every 10 seconds before firing, whichever comes first."
+        - >
+            This endpoint is newer than all of the other mark as read endpoints, so use this one.
+            The other endpoints are maintained for old clients to use.
+      params:
+        - key: story_hash
+          desc: "List of story hashes to mark as read."
+          required: true
+          example: >
+            story_hash=123:a1d62b&story_hash=1456789:4e3c12
+
+    - url: /reader/mark_story_as_read
+      method: POST
+      short_desc: "Mark a story as read (deprecated)."
+      long_desc: 
+        - "<b>Deprecated! Just send the <code>story_hash</code> to <code>mark_story_hashes_as_read</code>.</b>"
+        - "Mark stories as read (deprecated)."
+        - "Multiple story ids can be sent at once."
+        - "Each story must be from the same feed."
+      tips:
+        - "Throttle requests to mark as read. You don't need to send one request per story."
+        - "Queue up to 5 stories or once every 10 seconds before firing, whichever comes first."
+      params:
+        - key: story_id
+          desc: "List of story ids to mark as read."
+          required: true
+          example: >
+            story_id=http://blog.pytune.com/post/1&story_id=http://blog.pytune.com/post/2
+        - key: feed_id
+          desc: "Feed id that each story is from."
+          required: true
+          example: "42"
+  
+    - url: /reader/mark_feed_stories_as_read
+      method: POST
+      short_desc: "Mark stories from multiple feeds as read (deprecated)."
+      long_desc: 
+        - "<b>Deprecated! Just send the <code>story_hash</code> to <code>mark_story_hashes_as_read</code>.</b>"
+        - "Marks multiple stories as read."
+        - "Multiple story ids can be sent at once."
+        - "Multiple feeds can be sent."
+      tips:
+        - "Throttle requests to this endpoint. You don't need to send one request per story."
+        - "Queue up to 5 stories or once every 10 seconds before firing, whichever comes first."
+      params:
+        - key: feeds_stories
+          desc: "JSON serialized dictionary of feed_ids to an array of story_ids."
+          required: true
+          example: "{<br>12: ['story_id_1', 'story_id_2'],<br>24: ['story_id_3']<br>}"
+    
+    - url: /reader/mark_social_stories_as_read
+      method: POST
+      short_desc: "Mark stories from a pytuneblog as read (deprecated)."
+      long_desc: 
+        - "<b>Deprecated! Just send the <code>story_hash</code> to <code>mark_story_hashes_as_read</code>.</b>"
+        - "Marks multiple stories as read."
+        - "Multiple story ids can be sent at once."
+        - "Multiple feeds can be sent."
+      tips:
+        - "Throttle requests to this endpoint. You don't need to send one request per story."
+        - "Queue up to 5 stories or once every 10 seconds before firing, whichever comes first."
+      params:
+        - key: users_feeds_stories
+          desc: "JSON serialized dictionary of user_ids to feed_ids to an array of story_ids."
+          required: true
+          example: "{<br>user_id: <br>{feed_id: ['story_id_1', 'story_id_2'],<br>24: ['story_id_3']<br>}<br>}"
+    
+    - url: /reader/mark_story_as_unread
+      method: POST
+      short_desc: "Mark a story as unread."
+      long_desc: 
+        - "Mark a story as unread."
+      params:
+        - key: story_id
+          desc: "Story id to mark unread."
+          required: true
+          example: "http://www.ofbrooklyn.com/story-title"
+        - key: feed_id
+          desc: "Feed id that the story is from."
+          required: true
+          example: "42"
+
+    - url: /reader/mark_story_hash_as_unread
+      method: POST
+      short_desc: "Mark a story as unread."
+      long_desc: 
+        - "Mark a single story as unread using its unique story_hash."
+        - "Premium users can mark up to 30 days as unread. Free users only have 15 days."
+        - >
+            If a story is too old to mark as read, look for (and display to the user) the 
+            <code>message</code> parameter returned back to you.
+      tips:
+        - >
+            This endpoint is newer than all of the other mark as read endpoints, so use this one.
+            The other endpoints are maintained for old clients to use.
+      params:
+        - key: story_hash
+          desc: "A story hash to mark as unread."
+          required: true
+          example: >
+            story_hash=123:a1d62b
+
+    - url: /reader/mark_story_as_starred
+      method: POST
+      short_desc: "Mark a story as starred (saved)."
+      long_desc: 
+        - "Mark a story as starred (saved)."
+      params:
+        - key: story_id
+          desc: "Story id to save."
+          required: true
+          example: "64"
+        - key: feed_id
+          desc: "Feed id that the story is from."
+          required: true
+          example: "42"
+
+    - url: /reader/mark_story_hash_as_starred
+      method: POST
+      short_desc: "Mark a story as starred (saved)."
+      long_desc: 
+        - "Mark a story as starred (saved)."
+      params:
+        - key: story_hash
+          desc: "Story to save, specified by hash."
+          required: true
+          example: "64:a295ed"
+  
+    - url: /reader/mark_story_as_unstarred
+      method: POST
+      short_desc: "Mark a story as unstarred (unsaved)."
+      long_desc: 
+        - "Mark a story as unstarred (unsaved)."
+      params:
+        - key: story_id
+          desc: "Story id to unsave."
+          required: true
+          example: "64"
+        - key: feed_id
+          desc: "Feed id that the story is from."
+          required: true
+          example: "42"
+  
+    - url: /reader/mark_story_hash_as_unstarred
+      method: POST
+      short_desc: "Mark a story as unstarred (unsaved)."
+      long_desc: 
+        - "Mark a story as unstarred (unsaved)."
+      params:
+        - key: story_hash
+          desc: "Story to unsave, specified by hash."
+          required: true
+          example: "64:a295ed"
+
+    - url: /reader/mark_feed_as_read
+      method: POST
+      short_desc: "Mark a list of feeds as read."
+      long_desc: 
+        - "Mark a list of feeds as read."
+      params:
+        - key: feed_id
+          desc: "List of feed ids to mark as read."
+          required: true
+          example: "feed_id=12&feed_id=24"
+        - key: cutoff_timestamp
+          desc: "Timestamp for older/newer cutoff."
+          optional: true
+          example: "1400777921"
+        - key: direction
+          desc: "Older or newer stories should be marked as read. Use with <code>cutoff_timestamp</code>"
+          optional: true
+          example: "older"
+      tips:
+        - "To mark a folder as read, send the ids of each feed inside the folder."
+    
+    - url: /reader/mark_all_as_read
+      method: POST
+      short_desc: "Mark all stories from all feeds as read."
+      long_desc: 
+        - "Mark all stories from all feeds as read."
+      tips:
+        - "Use <code>0</code> days back to mark everything as read."
+      params:
+        - key: days
+          desc: "Days back to mark as read."
+          optional: true
+          default: "0"
+          example: "7"
+
+- social:
+    - url: /social/river_stories
+      method: GET
+      short_desc: "Stories from multiple users (River of News)."
+      long_desc: 
+        - "Retrieve stories from a collection of social subscriptions. This is known as the River of News."
+        - "Stories are ordered in reverse chronological order by default."
+        - "Only unread stories are available."
+      params:
+        - key: social_user_ids
+          desc: "User ids to use in the river."
+          required: true
+          example: "feed_id=12&feed_id=24"
+        - key: page
+          desc: "Page of stories, starting from 1."
+          optional: true
+          default: 1
+          example: 2
+        - key: order
+          desc: "Story order by oldest or newest first"
+          optional: true
+          default: newest
+          example: oldest
+    - url: /social/share_story
+      method: POST
+      short_desc: "Share a story with optional comments."
+      long_desc: 
+        - "Share a story with optional comments. The story is shared on the user's pytuneblog."
+      params:
+        - key: feed_id
+          desc: "Feed id that the story is from."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "Story id to share."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: comments
+          desc: "The meat of the share."
+          optional: true
+          example: "42"
+        - key: source_user_id
+          desc: >
+            If the story is being re-shared from another pytuneblog, note the 
+            user_id of the original sharer.
+          optional: true
+          example: "128"
+        - key: post_to_services
+          desc: "List of services to cross-post to. Can be 'twitter' and/or 'facebook'."
+          optional: true
+          example: "post_to_services=twitter&post_to_service=facebook"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/unshare_story
+      method: POST
+      short_desc: "Remove a shared story from user's pytuneblog."
+      long_desc: 
+        - >
+          Removes a shared story from a user's pytuneblog. Unshares the story and
+          removes the comments. Any replies will also be deleted. This may change.
+      params:
+        - key: feed_id
+          desc: "Feed id that the story is from."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "Story id to remove the existing share."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/load_user_friends
+      method: GET
+      short_desc: "Lists of user profiles: followers, followings, etc."
+      long_desc: 
+        - This lists the user profiles of followers and followings of a user. 
+        - Also returns information related to which sharing services a user is using.
+    - url: /social/profile
+      method: GET
+      short_desc: "Public profile of a user."
+      long_desc: 
+        - "Public profile of a user. Includes common followers and common followings."
+      params:
+        - key: user_id
+          desc: "User id of user"
+          required: true
+          example: "42"
+    - url: /social/load_user_profile
+      method: GET
+      short_desc: "Private details of the current user's profile and connected services."
+      long_desc: 
+        - "Private details of the current user's profile and connected services."
+    - url: /social/save_user_profile
+      method: POST
+      short_desc: "Saves a user's profile details."
+      long_desc: 
+        - "Saves a user's profile details."
+      params:
+        - key: location
+          desc: "Hometown"
+          optional: true
+          example: "New York City"
+        - key: bio
+          desc: "160 character bio."
+          optional: true
+          example: "Developer. API Designer."
+        - key: website
+          desc: "Website address"
+          optional: true
+          example: "http://www.pytune.com"
+        - key: photo_service
+          desc: "Which photo service to use: twitter, facebook, gravatar."
+          optional: true
+          example: "twitter"
+    - url: /social/interactions
+      method: GET
+      short_desc: "Interactions between a user and other users."
+      long_desc: 
+        - "Interactions between a user and other users."
+      params:
+        - key: user_id
+          desc: "ID of user. Defaults to current logged in user."
+          optional: true
+          example: "42"
+        - key: page
+          desc: "4 interactions per page."
+          optional: true
+          example: "2"
+        - key: format
+          desc: "JSON or HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/activities
+      method: GET
+      short_desc: "A user's activities."
+      long_desc: 
+        - "A user's activities: follows, shared stories, and replies to comments."
+        - > 
+          Also includes starred stories and new site subscriptions if fetching the
+          currently logged in user's activities.
+      params:
+        - key: user_id
+          desc: "ID of user. Defaults to current logged in user."
+          optional: true
+          example: "42"
+        - key: page
+          desc: "4 activities per page."
+          optional: true
+          example: "2"
+        - key: format
+          desc: "JSON or HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/follow
+      method: POST
+      short_desc: "Follow a user and subscribe to their pytuneblog."
+      long_desc: 
+        - "Follow a user and subscribe to their pytuneblog."
+      params:
+        - key: user_id
+          desc: "ID of user to follow."
+          required: true
+          example: "42"
+    - url: /social/unfollow
+      method: POST
+      short_desc: "Unfollow a user and unsubscribe from their pytuneblog."
+      long_desc: 
+        - "Unfollow a user and unsubscribe from their pytuneblog."
+      params:
+        - key: user_id
+          desc: "ID of user to unfollow."
+          required: true
+          example: "42"
+    - url: /social/feed_trainer
+      method: GET
+      short_desc: "Get the intelligence classifiers for a pytuneblog."
+      long_desc: 
+        - "Get the intelligence classifiers for a pytuneblog."
+      params:
+        - key: user_id
+          desc: "ID of pytuneblog's user."
+          required: true
+          example: "42"
+    - url: /social/public_comments
+      method: GET
+      short_desc: "Get all public comments on a shared story."
+      long_desc: 
+        - "Get all public comments on a shared story."
+        - >
+          If you want comments from friends, they are already attached to the 
+          story from either <code>reader/feed/:id</code> or 
+          <code>/social/stories/:user_id</code>.
+      params:
+        - key: story_id
+          desc: "ID of shared story."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: feed_id
+          desc: "ID of feed for the shared story."
+          required: true
+          example: "42"
+        - key: format
+          desc: "JSON or HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/save_comment_reply
+      method: POST
+      short_desc: "Saves a reply to a comment."
+      long_desc: 
+        - "Saves a reply to a comment."
+        - "Comments can have a number of replies, but they are all one-level deep."
+        - >
+          Replying to a comment sends notifications to both original commenter and to 
+          every other replier to the comment.
+      params:
+        - key: story_feed_id
+          desc: "ID of feed the story belongs to."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "ID of story being commented on."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: comment_user_id
+          desc: "ID of user who left the original comment that is now being replied to."
+          required: true
+          example: "64"
+        - key: reply_comments
+          desc: "The content of the reply."
+          required: true
+          example: "Brilliant analysis."
+        - key: reply_id
+          desc: >
+            If editing an existing reply, provide the original reply id so the correct 
+            reply can be overwritten.
+          optional: true
+          example: "5000...0042"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/remove_comment_reply
+      method: POST
+      short_desc: "Deletes a reply."
+      long_desc: 
+        - "Deletes a reply from a comment."
+        - "Also deletes the interactions and activities associated with the reply."
+      params:
+        - key: story_feed_id
+          desc: "ID of feed the story belongs to."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "ID of story being commented on."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: comment_user_id
+          desc: "ID of user who left the original comment that is now being replied to."
+          required: true
+          example: "64"
+        - key: reply_id
+          desc: The reply's id
+          optional: true
+          example: "5000...0042"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/like_comment
+      method: POST
+      short_desc: "Favorites a comment."
+      long_desc: 
+        - "Favorites a comment."
+        - "Does not send an email to the recipient user, but they do see an interaction."
+      params:
+        - key: story_feed_id
+          desc: "ID of feed the story belongs to."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "ID of story being commented on."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: comment_user_id
+          desc: "ID of user who left the original comment that is now being replied to."
+          required: true
+          example: "64"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/remove_like_comment
+      method: POST
+      short_desc: "Un-favorites a comment."
+      long_desc: 
+        - "Un-favorites a comment."
+      params:
+        - key: story_feed_id
+          desc: "ID of feed the story belongs to."
+          required: true
+          example: "42"
+        - key: story_id
+          desc: "ID of story being commented on."
+          required: true
+          example: "http://blog.pytune.com/post/1"
+        - key: comment_user_id
+          desc: "ID of user who left the original comment that is now being replied to."
+          required: true
+          example: "64"
+        - key: format
+          desc: "Return JSON or a HTML template"
+          optional: true
+          default: "json"
+          example: "html"
+    - url: /social/find_friends
+      method: GET
+      short_desc: "Search for a user by username, email, or pytuneblog title."
+      long_desc: 
+        - "Search for a user by username, email, or pytuneblog title."
+      params:
+        - key: query
+          desc: "Username, email, or part of a pytuneblog title."
+          required: true
+          example: "kihyuck"
+    - url: /social/rss/:user_id/:username
+      method: GET
+      short_desc: "RSS feed for a pytuneblog."
+      long_desc: 
+        - "RSS feed for a pytuneblog."
+      tips:
+        - >
+          The <code>username</code> url parameter is optional. It's just recommended 
+          if you have it.
+    - url: /social/stories/:user_id/:username
+      method: GET
+      short_desc: "Shared stories from a user's pytuneblog."
+      long_desc: 
+        - "Shared stories from a user's pytuneblog."
+        - "Comments, replies, and profiles from followed users are automatically included."
+      params:
+        - key: order
+          desc: "Story order by oldest or newest first"
+          optional: true
+          default: newest
+          example: oldest
+        - key: read_filter
+          desc: "Show all stories or only unread stories"
+          optional: true
+          default: all
+          example: unread
+      tips:
+        - >
+          The <code>username</code> url parameter is optional. It's just recommended 
+          if you have it.
+    - url: /social/page/:user_id/:username
+      method: GET
+      short_desc: "A user's shared stories pytuneblog in HTML."
+      long_desc: 
+        - "A user's shared stories pytuneblog in HTML."
+        - "This may also live at a custom URL, which is specified in the user's full profile."
+      tips:
+        - >
+          The <code>username</code> url parameter is optional. It's just recommended 
+          if you have it.
+    - url: /social/settings/:user_id/:username
+      method: GET
+      short_desc: "A user's full profile."
+      long_desc: 
+        - "A user's full profile."
+      tips:
+        - >
+          The <code>username</code> url parameter is optional. It's just recommended 
+          if you have it.
+    - url: /social/statistics/:user_id/:username
+      method: GET
+      short_desc: "Get statistics and history for a pytuneblog."
+      long_desc: 
+        - "Get statistics and history for a pytuneblog."
+      tips:
+        - >
+          The <code>username</code> url parameter is optional. It's just recommended 
+          if you have it.
+    
+- "feed management":
+    - url: /reader/add_url
+      method: POST
+      short_desc: "Add a feed by its URL (RSS feed or website)."
+      long_desc: 
+        - "Add a feed by its URL. Can be either the RSS feed or the website itself."
+      params:
+        - key: url
+          desc: "URL of website or RSS feed."
+          required: true
+          example: "http://blog.pytune.com"
+        - key: folder
+          desc: "Folder to place feed in. Omit to use top level."
+          optional: true
+          default: "[Top Level]"
+          example: "Blogs"
+      tips:
+        - >
+          If you want to just show the Add Site dialog on the site, you can use this URL:
+          <code>http://www.pytune.com/?url=%u</code>
+  
+    - url: /reader/add_folder
+      method: POST
+      short_desc: "Add a new folder."
+      long_desc: 
+        - "Add a new folder."
+      params:
+        - key: folder
+          desc: "Folder name"
+          required: true
+          example: "Photo-blogs Extraordinaire"
+        - key: parent_folder
+          desc: "Existing folder to create new folder inside of. Omit for top level."
+          optional: true
+          default: "[Top Level]"
+          example: "All Blogs"
+  
+    - url: /reader/move_feed_to_folder
+      method: POST
+      short_desc: "Move a feed into a different folder."
+      long_desc: 
+        - "Move a feed into a different folder."
+      params:
+        - key: feed_id
+          desc: "Feed id."
+          required: true
+          example: 12
+        - key: in_folder
+          desc: >
+            Current folder the feed is in. Necessary to disambiguate if a feed is in 
+            multiple folders.
+          required: true
+          example: "Blogs"
+        - key: to_folder
+          desc: "Folder the feed is going into."
+          required: true
+          example: "Tumblrs"
+      tips:
+        - "Leave folder names blank to specify Top Level."
+
+    - url: /reader/move_folder_to_folder
+      method: POST
+      short_desc: "Move a folder into a different folder."
+      long_desc: 
+        - "Move a folder into a different folder."
+      params:
+        - key: folder_name
+          desc: "Name of folder being moved."
+          required: true
+          example: "Tumblrs"
+        - key: in_folder
+          desc: >
+            Current folder the folder is in. Necessary to disambiguate if a folder 
+            name is in multiple folders. (Please don't let this happen.)
+          required: true
+          example: "Blogs"
+        - key: to_folder
+          desc: "New folder the existing folder is going into."
+          required: true
+          example: "Daily Blogs"
+      tips:
+        - "Leave folder names blank to specify Top Level."
+
+    - url: /reader/rename_feed
+      method: POST
+      short_desc: "Rename a feed title."
+      long_desc: 
+        - "Rename a feed title. Only the current user will see the new title."
+      params:
+        - key: feed_title
+          desc: "New feed title."
+          required: true
+          example: "NYTimes"
+        - key: feed_id
+          desc: "Feed id of the feed to be renamed."
+          required: true
+          example: "42"
+  
+    - url: /reader/delete_feed
+      method: POST
+      short_desc: "Unsubscribe from a feed."
+      long_desc: 
+        - "Unsubscribe from a feed. Removes it from the folder."
+        - >
+          Set the <code>in_folder</code> parameter to remove a feed from the correct
+          folder, in case the user is subscribed to the feed in multiple folders.
+      params:
+        - key: feed_id
+          desc: "Feed id of feed to remove."
+          required: true
+          example: "42"
+        - key: in_folder
+          desc: "Name of folder the feed is in."
+          optional: true
+          example: "News"
+
+  
+    - url: /reader/rename_folder
+      method: POST
+      short_desc: "Rename a folder."
+      long_desc: 
+        - "Rename a folder."
+      params:
+        - key: folder_to_rename
+          desc: "Original folder name."
+          required: true
+          example: "Photoblogs"
+        - key: new_folder_name
+          desc: "New folder name."
+          required: true
+          example: "East Coast Photoblogs"
+        - key: in_folder
+          desc: "Name of parent folder, used to find the folder."
+          required: true
+          example: "Blogs"
+  
+    - url: /reader/delete_folder
+      method: POST
+      short_desc: "Delete a folder and unsubscribe from all feeds inside."
+      long_desc: 
+        - "Delete a folder and unsubscribe from all feeds inside."
+      params:
+        - key: folder_to_delete
+          desc: "Name of folder to delete."
+          required: true
+          example: "Photoblogs"
+        - key: in_folder
+          desc: "Name of parent folder, used to find the folder. Omit if folder is top level."
+          optional: true
+          example: "Blogs"
+        - key: feed_id
+          desc: "List of feed ids in the folder that's being deleted. These feeds also get removed."
+          optional: true
+          example: "feed_id=12&feed_id=24"
+
+  
+    - url: /reader/save_feed_order
+      method: POST
+      short_desc: "Reorder feeds and move them around between folders."
+      long_desc: 
+        - "Reorder feeds and move them around between folders."
+        - "The entire folder structure needs to be serialized."
+      params:
+        - key: folders
+          desc: "Object with folders and feed ids."
+          required: true
+          example: "[12, 24, 36, <br>{'Blogs': [56, 67, 78,<br />{'Photoblogs': [42]}]}]"
+          
+          
+- "intelligence classifiers":
+    - url: /classifier/:id
+      method: GET
+      short_desc: "Get the intelligence classifiers for a user's site."
+      long_desc: 
+        - "Get the intelligence classifiers for a user's site."
+        - >
+          Only includes the user's own classifiers. Use <code>/reader/feeds_trainer</code> 
+          for popular classifiers.
+      tips:
+        - >
+          All of this data is attached to a feed when called with 
+          <code>/reader/feed/:id</code>.
+        - >
+          After loading a feed, there is no need to explicitly call this endpoint, 
+          unless the feed has not yet been fetched.
+  
+    - url: /classifier/save
+      method: POST
+      short_desc: "Save intelligence classifiers for a feed."
+      long_desc: 
+        - "Save intelligence classifiers (tags, titles, authors, and the feed) for a feed."
+      tips:
+        - "The endpoint is far different from all other endpoints. It takes a variety of param keys."
+        - "You can send a list for any of the keys. <code>like_tag[]=tech&like_tag[]=mobile</code>"
+      params:
+        - key: feed_id
+          desc: "ID of feed for the classifier."
+          required: true
+          example: "42"
+        - key: "like_[TYPE]"
+          desc: "Positive score for TYPE <- [tag, author, title, feed]"
+          optional: true
+          example: "like_author=<br />K Hong"
+        - key: "dislike_[TYPE]"
+          desc: "Negative score for TYPE <- [tag, author, title, feed]"
+          optional: true
+          example: "dislike_title=<br />New York Yankees"
+        - key: "remove_like_[TYPE]"
+          desc: "Clear score for a classifier."
+          optional: true
+          example: "remove_like_author=<br />K Hong"
+        - key: "remove_dislike_[TYPE]"
+          desc: "Functionally the same as <code>remove_like_[TYPE]</code>."
+          optional: true
+          example: "remove_dislike_title=<br />New York Yankees"
+          
+          
+- "import/export":
+    - url: /import/opml_export
+      method: GET
+      short_desc: "Download backup of feeds as an OPML file."
+      long_desc: 
+        - "Download a backup of feeds and folders as an OPML file."
+        - "Contains folders and feeds in XML; useful for importing in another RSS reader."
+
+    - url: /import/opml_upload
+      method: POST
+      short_desc: "Upload an OPML file."
+      long_desc: 
+        - "Upload an OPML file."
+      params:
+        - key: file
+          desc: "The OPML file in XML format."
+          required: true

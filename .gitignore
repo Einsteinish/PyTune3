@@ -1,0 +1,78 @@
+logs/*.log
+logs/*.log.*
+logs/*.pid
+*.pyc
+static/*
+**/*SAVED
+local_settings.py
+celerybeat-schedule
+celerybeat.pid
+media/iphone/PyTune/build
+media/iphone/build
+media/ios/*
+media/android/*
+media/img/vectors/*
+media/img/originals/*
+build/
+.DS_Store
+**/*.perspectivev*
+data/
+config/certificates
+**/*.xcuserstate
+UserInterfaceState.xcuserstate
+UserInterfaceState\.xcuserstate
+*.xcuserstate
+xcuserdata
+.xcodeproj/ push.xcodeproj/project.pbxproj
+clients/ios/PyTune.xcodeproj/project.xcworkspace/xcshareddata/
+clients/ios/*
+*.mode1v3
+*.pbxuser
+media/maintenance.html
+media/maintenance.html.unused
+config/settings
+static.tgz
+.sass-cache
+media/css/circular/.sass-cache
+media/css/circular/sass/.sass-cache
+media/css/circular
+config/settings
+config/secrets
+templates/maintenance_on.html
+vendor/mms-agent/settings.py
+apps/social/spam.py
+venv
+
+# ----------------------
+# Android
+# ----------------------
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+clients/android/PyTune/bin/
+clients/android/PyTune/gen/
+clients/android/PyTune/app/
+clients/android/PyTuneTest/bin/
+clients/android/PyTuneTest/gen/
+
+# Local configuration file (sdk path, etc)
+clients/android/PyTune/local.properties
+clients/android/PyTuneTest/local.properties
+/originals
+media/safari/PyTune.safariextz
+
+# IDE files
+clients/android/PyTune/.idea
+clients/android/PyTune/.gradle
+clients/android/PyTune/build.gradle
+clients/android/PyTune/gradle*
+clients/android/PyTune/settings.gradle
+clients/android/*

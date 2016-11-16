@@ -1,0 +1,8 @@
+{% extends "mail/email_base.txt" %}
+
+{% load utils_tags %}
+
+{% block body %}{% if reason %}{{ reason }}{% else %}Here's a backup of your sites on PyTune.{% endif %} It contains {{ feed_count }} site{{ feed_count|pluralize }}. 
+
+You can re-upload the attached file to PyTune and get all of your sites back. 
+Just go to Manage > Import > Upload OPML.{% endblock body %}

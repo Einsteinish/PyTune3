@@ -1,0 +1,17 @@
+{
+  "name": "PyTune",
+  "description": "Visual feed reading with intelligence.",
+  "version": "1.1",
+  "icons": { 
+    "128": "logo_128.png"
+  },
+  "app": {
+    "urls": [
+      "http://www.pytune.com/"
+    ],
+    "launch": {
+      "web_url": "http://www.pytune.com/"
+    }
+  },
+  "permissions": []
+}

@@ -1,8 +1,8 @@
 # PyTune
 
- * Pytune is powered by Django 1.8.12 
+ * PyTune is powered by Django 1.8.12 
  * PyTune is a personal news reader bringing people together 
-   to talk about the world. A new sound of an old instrument.
+   to talk about the world. 
  * [www.pytune.com](http://www.pytune.com).
  * [Deploy Tutorial](http://bogotobogo.com/python/Django/Python_Django_tutorial_Deploy_Ubuntu_Nginx_uWSGI.php).
  * Note: The site is still in its early stage.

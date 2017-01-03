@@ -297,9 +297,9 @@ _.extend(PYTUNE.ReaderTutorial.prototype, {
             $.make('div', { className: 'NB-page NB-page-5' }, [
               $.make('h4', 'Stay connected to PyTune on Twitter'),
               $.make('div', { className: 'NB-tutorial-twitter' }, [
-                $.make('a', { className: 'NB-splash-link', href: 'http://twitter.com/samuelclay', target: '_blank' }, [
+                $.make('a', { className: 'NB-splash-link', href: 'https://twitter.com/KHongTwit', target: '_blank' }, [
                   $.make('img', { src: PYTUNE.Globals.MEDIA_URL+'/img/static/Samuel%20Clay%20sq.jpg', style: 'border-color: #505050;' }),
-                  $.make('span', '@samuelclay')
+                  $.make('span', '@khong')
                 ]),
                 $.make('a', { className: 'NB-splash-link', href: 'http://twitter.com/pytune', target: '_blank' }, [
                   $.make('img', { src: PYTUNE.Globals.MEDIA_URL+'/img/logo_128.png' }),
@@ -321,7 +321,7 @@ _.extend(PYTUNE.ReaderTutorial.prototype, {
               ]),
               $.make('ul', [
                 $.make('li', [
-                  $.make('a', { href: 'http://github.com/samuelclay', className: 'NB-splash-link' }, [
+                  $.make('a', { href: 'http://github.com/Einsteinish', className: 'NB-splash-link' }, [
                     $.make('img', { src: PYTUNE.Globals.MEDIA_URL+'/img/reader/howitworks_github.png', style: 'float: right;margin: -68px 12px 0 0' }),
                     'PyTune on ',
                     $.make('img', { src: PYTUNE.Globals.MEDIA_URL+'/img/reader/github_icon.png', style: 'vertical-align: middle;margin: -2px 0 0' }),

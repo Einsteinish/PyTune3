@@ -272,5 +272,5 @@ class UserAgentBanMiddleware:
             }
             logging.user(request, "~FB~SN~BBBanned UA: ~SB%s / %s (%s)" % (user_agent, request.path, request.META))
             
-            return HttpResponse(json.encode(data), status=403, mimetype='text/json')
+            return HttpResponse(json.encode(data), status=403, content_type='text/json')
 

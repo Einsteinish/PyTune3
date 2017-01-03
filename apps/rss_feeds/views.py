@@ -82,7 +82,7 @@ def load_feed_favicon(request, feed_id):
         return HttpResponseRedirect(settings.MEDIA_URL + 'img/icons/circular/world.png')
         
     icon_data = feed_icon.data.decode('base64')
-    return HttpResponse(icon_data, mimetype='image/png')
+    return HttpResponse(icon_data, content_type='image/png')
 
 @json.json_view
 def feed_autocomplete(request):

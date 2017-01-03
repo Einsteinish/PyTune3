@@ -1,12 +1,3 @@
-"""
-Whitelisting HTML sanitizer.
-
-Copyright (c) 2009-2010 Lefora <samuel@lefora.com>
-
-See LICENSE for license details.
-"""
-
-__author__ = "Samuel Stauffer <samuel@lefora.com>"
 __version__ = "1.6.1"
 __license__ = "BSD"
 __all__ = ['Scrubber', 'SelectiveScriptScrubber', 'ScrubberWarning', 'UnapprovedJavascript', 'urlize']

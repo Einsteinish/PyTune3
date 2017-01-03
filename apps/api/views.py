@@ -114,7 +114,7 @@ def add_site_load_script(request, token):
         'new_folder_image': new_folder_image,
     }, 
     context_instance=RequestContext(request),
-    mimetype='application/javascript')
+    content_type='application/javascript')
 
 def add_site(request, token):
     code       = 0
@@ -151,7 +151,7 @@ def add_site(request, token):
         'code':    code,
         'message': message,
         'usersub': us and us.feed_id,
-    }) + ')', mimetype='text/plain')
+    }) + ')', content_type='text/plain')
     
 def check_share_on_site(request, token):
     code       = 0
@@ -232,7 +232,7 @@ def check_share_on_site(request, token):
         'other_stories'     : other_stories,
         'previous_stories'  : previous_stories,
         'users'             : users,
-    }) + ')', mimetype='text/plain')
+    }) + ')', content_type='text/plain')
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'GET'
     
@@ -269,7 +269,7 @@ def share_story(request, token=None):
             'code':     code,
             'message':  message,
             'story':    None,
-        }), mimetype='text/plain')
+        }), content_type='text/plain')
     
     if feed_id:
         feed = Feed.get_by_id(feed_id)
@@ -348,7 +348,7 @@ def share_story(request, token=None):
         'code':     code,
         'message':  message,
         'story':    shared_story,
-    }), mimetype='text/plain')
+    }), content_type='text/plain')
     response['Access-Control-Allow-Origin'] = '*'
     response['Access-Control-Allow-Methods'] = 'POST'
     

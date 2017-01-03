@@ -72,7 +72,7 @@ def opml_upload(request):
             code = -1
             
     return HttpResponse(json.encode(dict(message=message, code=code, payload=payload)),
-                        mimetype='text/html')
+                        content_type='text/html')
 
 def opml_export(request):
     user     = get_user(request)
@@ -82,7 +82,7 @@ def opml_export(request):
     exporter = OPMLExporter(user)
     opml     = exporter.process()
     
-    response = HttpResponse(opml, mimetype='text/xml')
+    response = HttpResponse(opml, content_type='text/xml')
     response['Content-Disposition'] = 'attachment; filename=PyTune-%s-%s' % (
         user.username,
         now.strftime('%Y-%m-%d')

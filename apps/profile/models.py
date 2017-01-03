@@ -873,7 +873,7 @@ PyTune""" % {'user': self.user.username, 'feeds': subs.count()}
         
             
 def create_profile(sender, instance, created, **kwargs):
-    print 'KH profile.models create_profile()'
+    print 'KH profile.models at create_profile()'
     if created:
         Profile.objects.create(user=instance)
     else:

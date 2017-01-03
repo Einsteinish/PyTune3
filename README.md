@@ -38,7 +38,7 @@
    Indispensible.
  * Miscellaneous jQuery Plugins: Everything from resizable layouts, to progress 
    bars, sortables, date handling, colors, corners, JSON, animations. 
-   [See the complete list](https://github.com/samuelclay/PyTune/tree/master/media/js).
+   [See the complete list](https://github.com/Einsteinish/PyTune3/tree/master/media/js).
 
 
 ## Installation Instructions

@@ -560,12 +560,12 @@
             <string name="htmlUrl">http://saltandfat.com/</string>
         </object>
         <object>
-            <string name="id">feed/http://www.ofbrooklyn.com/feeds/all/</string>
-            <string name="title">Samuel Clay's OfBrooklyn.com</string>
+            <string name="id">feed/http://www.pytune.com/feeds/all/</string>
+            <string name="title">K Hong's pytune.com</string>
             <list name="categories"/>
             <string name="sortid">5A3F6CB4</string>
             <number name="firstitemmsec">1263599185291</number>
-            <string name="htmlUrl">http://conesus.com</string>
+            <string name="htmlUrl">http://pytune.com</string>
         </object>
         <object>
             <string name="id">feed/http://www.scoutingny.com/?feed=rss2</string>

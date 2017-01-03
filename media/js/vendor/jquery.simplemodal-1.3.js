@@ -8,7 +8,7 @@
 
 /*
 
-  Samuel Clay
+  K. Hong
   - Added callback on $.modal.close();
   
 */

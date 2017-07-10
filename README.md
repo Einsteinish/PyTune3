@@ -356,7 +356,7 @@ You got the downtime message either through email or SMS. This is the order of o
 
  * Email address: <kihyuck.hong@gmail.com>
  * [@KHong](https://twitter.com/KHongTwit) on Twitter.
-
+ * Original Author : [NewsBlur](https://github.com/samuelclay/NewsBlur)
 
 ## License
 
